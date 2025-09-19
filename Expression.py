@@ -351,3 +351,21 @@ class IfThenElse(Expression):
         30
         """
         return visitor.visit_ifThenElse(self, arg)
+
+class And(BinaryExpression):
+
+    def accept(self, visitor, arg):
+
+        return visitor.visit_add(self,arg)
+
+class Or(BinaryExpression):
+
+    def accept(self, visitor, arg):
+
+        return visitor.visit_or(self,arg)
+
+
+
+
+
+
