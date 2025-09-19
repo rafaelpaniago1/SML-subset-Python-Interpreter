@@ -157,6 +157,34 @@ class Parser:
             raise SyntaxError("Extra tokens at the end of expression")
         return expr
 
+    def parse_1(self):
+        tok = self.curr_token()
+
+        if tok is not None and tok.kind == TokenType.IF:
+            self.advance()
+            cond = self.parse_1()
+            tok = self.curr_token()
+
+            if tok is not None and tok.kind != TokenType.THEN:
+                raise ValueError("Expected THEN token")
+            self.advance()
+
+            e0 = self.parse_1()
+            tok = self.curr_token()
+
+            if tok is not None and tok.kind != TokenType.ELSE:
+                raise ValueError("Expected ELSE token")
+            self.advance()
+
+            e1 = self.parse_1()
+
+            return IfThenElse(cond, e0, e1)
+        else:
+            return self.parse_2()
+
+    def parse_2(self):
+        pass
+
     def parse_not(self):
 
         tok = self.curr_token()
