@@ -39,6 +39,8 @@ class TokenType(enum.Enum):
     IF = 218
     THEN = 219
     ELSE = 220
+    OR = 221
+    AND = 222
 
 
 class Lexer:
@@ -150,6 +152,12 @@ class Lexer:
         if self.source.startswith("else", self.sourcePointer):
             self.sourcePointer += 4
             return Token("else", TokenType.ELSE)
+        if self.source.startswith("and", self.sourcePointer):
+            self.sourcePointer += 3
+            return Token("and", TokenType.AND)
+        if self.source.startswith("or", self.sourcePointer):
+            self.sourcePointer += 2
+            return Token("or", TokenType.OR)
 
         if self.currChar.isalpha():
             text = self.currChar
