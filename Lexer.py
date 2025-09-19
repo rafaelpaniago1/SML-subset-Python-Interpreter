@@ -31,16 +31,15 @@ class TokenType(enum.Enum):
     LPR = 210
     RPR = 211
     VAR = 212
-    NOME = 213
-    LET = 214
-    IN = 215
-    END = 216
-    BACKARROW = 217
-    IF = 218
-    THEN = 219
-    ELSE = 220
-    OR = 221
-    AND = 222
+    LET = 213
+    IN = 214
+    END = 215
+    BACKARROW = 216
+    IF = 217
+    THEN = 218
+    ELSE = 219
+    OR = 220
+    AND = 221
 
 
 class Lexer:
@@ -165,7 +164,7 @@ class Lexer:
             while self.currChar is not None and (self.currChar.isalpha() or self.currChar.isdigit()):
                 text += self.currChar
                 self.nextChar()
-            return Token(text, TokenType.NOME)
+            return Token(text, TokenType.VAR)
 
         # Numbers
         if self.currChar.isdigit():
