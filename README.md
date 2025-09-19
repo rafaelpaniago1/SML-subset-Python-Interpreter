@@ -1,9 +1,3 @@
-Yes, that's an excellent description for your repository. It's concise, informative, and gives visitors a clear understanding of what the project is and how it works.
-
-Here is a slightly refined version you can use directly. I've added a section for the project's background to give it more context and a call to action at the end.
-
-Project Description
-
 A Python-based Interpreter for a Subset of Standard ML 💻
 
 This repository hosts a simple interpreter for a subset of the Standard ML (SML) programming language, built from scratch in Python. The project serves as a practical demonstration of core compiler design principles, including lexical analysis, parsing, and semantic evaluation.
