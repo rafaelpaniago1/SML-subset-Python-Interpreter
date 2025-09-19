@@ -50,6 +50,15 @@ class Visitor(ABC):
     @abstractmethod
     def visit_let(self, let, env):
         pass
+    @abstractmethod
+    def visit_and(self, exp, env):
+        pass
+    @abstractmethod
+    def visit_or(self, exp, env):
+        pass
+    @abstractmethod
+    def visit_ifThenElse(self, exp, env):
+        pass
 
 class EvalVisitor(Visitor):
     """
@@ -112,9 +121,31 @@ class EvalVisitor(Visitor):
 
     def visit_let(self, let, env):
         definition_value = let.exp_def.accept(self, env)
-        new_env = env
+        new_env = env.copy()
         new_env[let.identifier] = definition_value
         return let.exp_body.accept(self, new_env) 
+    
+    def visit_and(self, exp, env):
+        e0 = exp.left.accept(self, env)
+        if e0:
+            return exp.right.accept(self, env)
+        else:
+            return False
+
+    def visit_or(self, exp, env): 
+        e0 = exp.left.accept(self, env)
+        if not e0:
+            return exp.right.accept(self, env) 
+        else:
+            return True
+    
+    def visit_ifThenElse(self, exp, env):
+        cond = exp.cond.accept(self, env)
+        if cond:
+            return exp.e0.accept(self, env)
+        else:
+            return exp.e1.accept(self, env)
+
 
 class UseDefVisitor(Visitor):
     """
@@ -191,6 +222,15 @@ class UseDefVisitor(Visitor):
         env_for_body = env | {let.identifier} 
         undef_in_body = let.exp_body.accept(self, env_for_body) 
         return undef_in_body |  undef_in_def 
+
+    def visit_and(self, exp, env):
+        return exp.left.accept(self, env) | exp.right.accept(self, env)
+
+    def visit_or(self, exp, env):
+        return exp.left.accept(self, env) | exp.right.accept(self, env)
+
+    def visit_ifThenElse(self, exp, env):
+        return exp.cond.accept(self, env) | exp.e0.accept(self, env) | exp.e1.accept(self, env)
 
 def safe_eval(exp):
     """
