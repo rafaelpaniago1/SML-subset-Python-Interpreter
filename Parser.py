@@ -307,7 +307,7 @@ class Parser:
                 self.advance()
                 node = Lth(node, self.parse_3())
 
-            if tok.kind == TokenType.LEQ:
+            elif tok.kind == TokenType.LEQ:
 
                 self.advance()
                 node = Leq(node, self.parse_3())
@@ -328,7 +328,7 @@ class Parser:
                 self.advance()
                 node = Add(node, self.parse_2())
 
-            if tok.kind == TokenType.SUB:
+            elif tok.kind == TokenType.SUB:
 
                 self.advance()
                 node = Sub(node, self.parse_2())
@@ -350,7 +350,7 @@ class Parser:
                 self.advance()
                 node = Mul(node, self.parse_1())
 
-            if tok.kind == TokenType.DIV:
+            elif tok.kind == TokenType.DIV:
 
                 self.advance()
                 node = Div(node, self.parse_1())
@@ -372,7 +372,7 @@ class Parser:
             identifier = ""
             self.advance()
             tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.NOME:
+            if tok is not None and tok.kind != TokenType.VAR:
                 raise SyntaxError("Expected identifier")
 
             identifier = tok.text if tok is not None else ""
@@ -409,7 +409,7 @@ class Parser:
                 raise SyntaxError("No closing parenthesis") 
             self.advance()
             return exp
-        elif tok is not None and tok.kind == TokenType.NOME:
+        elif tok is not None and tok.kind == TokenType.VAR:
             self.advance()
             return Var(tok.text) 
 
