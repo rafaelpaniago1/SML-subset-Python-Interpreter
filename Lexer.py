@@ -117,7 +117,6 @@ class Lexer:
             self.nextChar()
             return Token(")", TokenType.RPR)
 
-        # Keywords
         if self.source.startswith("true", self.sourcePointer):
             self.sourcePointer += 4
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
@@ -144,19 +143,54 @@ class Lexer:
             return Token("in", TokenType.IN)
         if self.source.startswith("if", self.sourcePointer):
             self.sourcePointer += 2
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("if", TokenType.IF)
         if self.source.startswith("then", self.sourcePointer):
             self.sourcePointer += 4
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("then", TokenType.THEN)
         if self.source.startswith("else", self.sourcePointer):
             self.sourcePointer += 4
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("else", TokenType.ELSE)
         if self.source.startswith("and", self.sourcePointer):
             self.sourcePointer += 3
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("and", TokenType.AND)
         if self.source.startswith("or", self.sourcePointer):
             self.sourcePointer += 2
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("or", TokenType.OR)
+
+        if self.currChar.isdigit():
+            text = self.currChar
+            self.nextChar()
+            if text == "0":
+                if self.currChar in ("b", "B"):
+                    text += self.currChar
+                    self.nextChar()
+                    while self.currChar is not None and self.currChar in ("0", "1"):
+                        text += self.currChar
+                        self.nextChar()
+                    return Token(text, TokenType.BIN)
+                if self.currChar in ("x", "X"):
+                    text += self.currChar
+                    self.nextChar()
+                    while self.currChar is not None and (self.currChar.isdigit() or self.currChar.upper() in "ABCDEF"):
+                        text += self.currChar
+                        self.nextChar()
+                    return Token(text, TokenType.HEX)
+                if self.currChar is not None and self.currChar.isdigit():
+                    while self.currChar is not None and self.currChar.isdigit():
+                        text += self.currChar
+                        self.nextChar()
+                    return Token(text, TokenType.OCT)
+                return Token("0", TokenType.INT)
+            else:
+                while self.currChar is not None and self.currChar.isdigit():
+                    text += self.currChar
+                    self.nextChar()
+                return Token(text, TokenType.INT)
 
         if self.currChar.isalpha():
             text = self.currChar
@@ -166,43 +200,7 @@ class Lexer:
                 self.nextChar()
             return Token(text, TokenType.VAR)
 
-        # Numbers
-        if self.currChar.isdigit():
-            text = self.currChar
-            self.nextChar()
-            if text == "0":
-                # binary
-                if self.currChar in ("b", "B"):
-                    text += self.currChar
-                    self.nextChar()
-                    while self.currChar is not None and self.currChar in ("0", "1"):
-                        text += self.currChar
-                        self.nextChar()
-                    return Token(text, TokenType.BIN)
-                # hex
-                if self.currChar in ("x", "X"):
-                    text += self.currChar
-                    self.nextChar()
-                    while self.currChar is not None and (self.currChar.isdigit() or self.currChar.upper() in "ABCDEF"):
-                        text += self.currChar
-                        self.nextChar()
-                    return Token(text, TokenType.HEX)
-                # octal (leading zero but not 0x/0b)
-                if self.currChar is not None and self.currChar.isdigit():
-                    while self.currChar is not None and self.currChar.isdigit():
-                        text += self.currChar
-                        self.nextChar()
-                    return Token(text, TokenType.OCT)
-                # just "0"
-                return Token("0", TokenType.INT)
-            else:
-                # decimal int
-                while self.currChar is not None and self.currChar.isdigit():
-                    text += self.currChar
-                    self.nextChar()
-                return Token(text, TokenType.INT)
 
-        # Unknown characters
         ch = self.currChar
         self.nextChar()
-        return Token(ch, TokenType.STR)  # fallback
+        return Token(ch, TokenType.STR)
