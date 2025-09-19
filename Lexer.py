@@ -36,6 +36,9 @@ class TokenType(enum.Enum):
     IN = 215
     END = 216
     BACKARROW = 217
+    IF = 218
+    THEN = 219
+    ELSE = 220
 
 
 class Lexer:
@@ -138,6 +141,15 @@ class Lexer:
             self.sourcePointer += 2
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("in", TokenType.IN)
+        if self.source.startswith("if", self.sourcePointer):
+            self.sourcePointer += 2
+            return Token("if", TokenType.IF)
+        if self.source.startswith("then", self.sourcePointer):
+            self.sourcePointer += 4
+            return Token("then", TokenType.THEN)
+        if self.source.startswith("else", self.sourcePointer):
+            self.sourcePointer += 4
+            return Token("else", TokenType.ELSE)
 
         if self.currChar.isalpha():
             text = self.currChar
