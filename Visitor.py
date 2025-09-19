@@ -84,7 +84,7 @@ class EvalVisitor(Visitor):
         if var.identifier in env:
             return env[var.identifier]
         else:
-            raise ValueError(f"Variavel inexistente {var.identifier}")
+            raise sys.exit("Def error") 
 
     def visit_bln(self, bln, env):
         return bln.bln
