@@ -356,7 +356,7 @@ class And(BinaryExpression):
 
     def accept(self, visitor, arg):
 
-        return visitor.visit_add(self,arg)
+        return visitor.visit_and(self,arg)
 
 class Or(BinaryExpression):
 
