@@ -227,7 +227,7 @@ class Parser:
 
         tok = self.curr_token()
         if tok is not None:
-            raise SyntaxError("Extra tokens at the end of expression")
+            sys.exit("Parse error")
         return expr
 
     def parse_8(self):
@@ -373,27 +373,30 @@ class Parser:
             self.advance()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.VAR:
-                raise SyntaxError("Expected identifier")
+                sys.exit("Parse error")
 
             identifier = tok.text if tok is not None else ""
             self.advance()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.BACKARROW:
-                raise SyntaxError("Expected back arrow")
+                sys.exit("Parse error")
+
             else:
                 self.advance()
                 tok = self.curr_token()
             exp_def = self.parse_8()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.IN:
-                raise SyntaxError("Expected IN token")
+                sys.exit("Parse error")
+
             else:
                 self.advance()
                 tok = self.curr_token()
             exp_body = self.parse_8()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.END:
-                raise SyntaxError("Expected END token")
+                sys.exit("Parse error")
+
             else:
                 self.advance()
             return Let(identifier, exp_def, exp_body)
@@ -406,7 +409,7 @@ class Parser:
             exp = self.parse_8()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.RPR:
-                raise SyntaxError("No closing parenthesis") 
+                sys.exit("Parse error")
             self.advance()
             return exp
         elif tok is not None and tok.kind == TokenType.VAR:
@@ -421,126 +424,7 @@ class Parser:
             self.advance()
             return Not(self.parse_1())
         else:
-            raise SyntaxError("Unexpected token")
+            sys.exit("Parse error")
 
 
-##########################################################################################
-    def parse_not(self):
-
-        tok = self.curr_token()
-        if tok is not None and tok.kind == TokenType.NOT:
-            self.advance()
-            operand = self.parse_not()
-            return Not(operand)
-        return self.parse_comparing()
-
-    def parse_comparing(self):
-
-        node = self.parse_add_sub()
-        tok = self.curr_token()
-        while tok is not None and tok.kind in (TokenType.LEQ, TokenType.LTH, TokenType.EQL):
-            if tok.kind == TokenType.LEQ:
-                self.advance()
-                node = Leq(node, self.parse_add_sub())
-            elif tok.kind == TokenType.LTH:
-                self.advance()
-                node = Lth(node, self.parse_add_sub())
-            elif tok.kind == TokenType.EQL:
-                self.advance()
-                node = Eql(node, self.parse_add_sub())
-            tok = self.curr_token()
-        return node
-
-
-    def parse_add_sub(self):
-
-        node = self.parse_mul_div()
-        tok = self.curr_token()
-        while tok is not None and tok.kind in (TokenType.ADD, TokenType.SUB):
-            if tok.kind == TokenType.ADD:
-                self.advance()
-                node = Add(node, self.parse_mul_div())
-            elif tok.kind == TokenType.SUB:
-                self.advance()
-                node = Sub(node, self.parse_mul_div())
-            tok = self.curr_token()
-        return node
-
-    def parse_mul_div(self):
-
-        node = self.parse_neg()
-        tok = self.curr_token()
-        while tok is not None and tok.kind in (TokenType.MUL, TokenType.DIV):
-            if tok.kind == TokenType.MUL:
-                self.advance()
-                node = Mul(node, self.parse_neg())
-            elif tok.kind == TokenType.DIV:
-                self.advance()
-                node = Div(node, self.parse_neg())
-            tok = self.curr_token()
-        return node
-
-    def parse_neg(self):
-
-        tok = self.curr_token()
-        if tok is not None and tok.kind == TokenType.NEG:
-            self.advance()
-            other = self.parse_neg()
-            return Neg(other)
-        return self.parse_let()
-
-    def parse_let(self):
-
-        tok = self.curr_token()
-        if tok is not None and tok.kind in (TokenType.HEX, TokenType.BIN, TokenType.INT, TokenType.OCT):
-            self.advance()
-            return Num(int(tok.text, 0))
-        #Implement parsing for let and var expressions
-        elif tok is not None and tok.kind == TokenType.LET:
-            
-            identifier = ""
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.NOME:
-                raise SyntaxError("Expected identifier")
-
-            identifier = tok.text if tok is not None else ""
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.BACKARROW:
-                raise SyntaxError("Expected back arrow")
-            else:
-                self.advance()
-                tok = self.curr_token()
-            exp_def = self.parse_not()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.IN:
-                raise SyntaxError("Expected IN token")
-            else:
-                self.advance()
-                tok = self.curr_token()
-            exp_body = self.parse_not()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.END:
-                raise SyntaxError("Expected END token")
-            else:
-                self.advance()
-            return Let(identifier, exp_def, exp_body)
-
-        elif tok is not None and tok.kind in (TokenType.FLS, TokenType.TRU):
-            self.advance()
-            return Bln(tok.kind == TokenType.TRU) 
-        elif tok is not None and tok.kind == TokenType.LPR:
-            self.advance()
-            exp = self.parse_not()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.RPR:
-                raise SyntaxError("No closing parenthesis") 
-            self.advance()
-            return exp
-        elif tok is not None and tok.kind == TokenType.NOME:
-            self.advance()
-            return Var(tok.text) 
-        else:
-            raise SyntaxError("Unexpected token")
 
