@@ -95,7 +95,7 @@ class EvalVisitor(Visitor):
     def visit_eql(self, eql, env):
         left = eql.left.accept(self, env)
         right = eql.right.accept(self, env)
-        if type(left) == type(1) and type(right) == type(1):
+        if type(left) == type(right):
             return left == right
         else:
             sys.exit("Type error")
