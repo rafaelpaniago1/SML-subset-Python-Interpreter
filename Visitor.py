@@ -394,7 +394,7 @@ class CtrGenVisitor(Visitor):
 
     def visit_and(self, exp, env):
         K0 = exp.left.accept(self, type(True))
-        K1 = exp.left.accept(self, type(True))
+        K1 = exp.right.accept(self, type(True))
         return K0 | K1 | {(env, type(True))}
 
     def visit_leq(self, leq, env):
