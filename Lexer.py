@@ -40,6 +40,8 @@ class TokenType(enum.Enum):
     ELSE = 219
     OR = 220
     AND = 221
+    FNX = 222
+    ARW = 223
 
 
 class Lexer:
@@ -117,6 +119,14 @@ class Lexer:
             self.nextChar()
             return Token(")", TokenType.RPR)
 
+        if self.source.startswith("fn", self.sourcePointer):
+            self.sourcePointer += 2 
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("fn", TokenType.FNX)
+        if self.source.startswith("=>", self.sourcePointer):
+            self.sourcePointer += 205
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("=>", TokenType.ARW)
         if self.source.startswith("true", self.sourcePointer):
             self.sourcePointer += 4
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
