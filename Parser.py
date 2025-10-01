@@ -223,7 +223,7 @@ class Parser:
 
         if not self.tokens:
             raise ValueError("Cannot parse empty stream of tokens")
-        expr = self.parse_8()
+        expr = self.parse_9()
 
         tok = self.curr_token()
         if tok is not None:
@@ -236,14 +236,14 @@ class Parser:
 
         if tok is not None and tok.kind == TokenType.FNX:
            self.advance() 
-           arg = self.parse_8()
+           arg = self.parse_9()
            tok = self.curr_token()
 
            if tok is not None and tok.kind != TokenType.ARW:
               raise ValueError("Expected ARW token")
 
            self.advance()
-           body = self.parse_8()
+           body = self.parse_9()
            tok = self.curr_token()
            
            return Fn(arg, body)
