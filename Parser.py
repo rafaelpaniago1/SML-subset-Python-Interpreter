@@ -229,6 +229,28 @@ class Parser:
         if tok is not None:
             sys.exit("Parse error")
         return expr
+    
+    def parse_9(self):
+        
+        tok = self.curr_token()
+
+        if tok is not None and tok.kind == TokenType.FNX:
+           self.advance() 
+           arg = self.parse_8()
+           tok = self.curr_token()
+
+           if tok is not None and tok.kind != TokenType.ARW:
+              raise ValueError("Expected ARW token")
+
+           self.advance()
+           body = self.parse_8()
+           tok = self.curr_token()
+           
+           return Fn(arg, body)
+
+        else:
+            return self.parse_8()
+
 
     def parse_8(self):
 
