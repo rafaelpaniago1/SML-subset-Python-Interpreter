@@ -2,6 +2,16 @@ import sys
 from abc import ABC, abstractmethod
 from Expression import *
 
+class Function():
+    def __init__(self, formal, body, env):
+
+        self.formal = formal
+        self.body = body
+        self.env = env
+
+    def str(self):
+        return f"Fn({self.formal})"
+
 class Visitor(ABC):
     """
     The visitor pattern consists of two abstract classes: the Expression and the
@@ -58,6 +68,12 @@ class Visitor(ABC):
         pass
     @abstractmethod
     def visit_ifThenElse(self, exp, env):
+        pass
+    @abstractmethod
+    def visit_function(self, exp, env):
+        pass
+    @abstractmethod
+    def visit_app(self, exp, env):
         pass
 
 class EvalVisitor(Visitor):
@@ -295,6 +311,14 @@ class UseDefVisitor(Visitor):
 
     def visit_ifThenElse(self, exp, env):
         return exp.cond.accept(self, env) | exp.e0.accept(self, env) | exp.e1.accept(self, env)
+    
+    def visit_app(self, exp, env):
+        #IMPLEMENTAR DEPOIS
+        pass 
+
+    def visit_function(self, exp, env):
+        #IMPLEMENTAR DEPOIS
+        pass
 
 def safe_eval(exp):
     """
@@ -412,4 +436,12 @@ class CtrGenVisitor(Visitor):
         K0 = eql.left.accept(self, TV_1)
         K1 = eql.right.accept(self, TV_1) 
         return K0 | K1 | {(env, type(True))}
+
+    def visit_app(self, exp, env):
+        pass
+        #IMPLEMENTAR ISSO AQUI DEPOIS
+
+    def visit_function(self, exp, env):
+        pass
+        #IMPLEMENTAR ISSO AQUI DEPOIS
 
