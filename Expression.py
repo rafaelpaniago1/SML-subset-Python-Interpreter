@@ -372,7 +372,7 @@ class Fn(Expression):
         self.body = body
 
     def accept(self, visitor, arg):
-        return visitor.visit_fn(self, arg)
+        return visitor.visit_function(self, arg)
 
 class App(Expression):
 
