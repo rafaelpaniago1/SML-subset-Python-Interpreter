@@ -240,7 +240,7 @@ class Parser:
 
            if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token")
-           arg = tok.txt 
+           arg = Var(str(tok.txt))
 
            self.advance()
            tok = self.curr_token()
