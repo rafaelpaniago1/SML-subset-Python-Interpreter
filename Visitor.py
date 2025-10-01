@@ -9,8 +9,8 @@ class Function():
         self.body = body
         self.env = env
 
-    def str(self):
-        return f"Fn({self.formal})"
+    def __str__(self):
+        return f"Fn({self.formal.identifier})"
 
 class Visitor(ABC):
     """
@@ -238,8 +238,8 @@ class EvalVisitor(Visitor):
 
         e2 = exp.actual.accept(self, env)
 
-        new_env = env
-        new_env[e1.formal] = e2
+        new_env = e1.env.copy()
+        new_env[e1.formal.identifier] = e2
         return e1.body.accept(self, new_env)
 
 class UseDefVisitor(Visitor):
