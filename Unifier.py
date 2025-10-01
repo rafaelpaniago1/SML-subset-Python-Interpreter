@@ -41,7 +41,7 @@ def name_sets(sets):
         [<class 'int'>, <class 'bool'>]
     """
     canonical_set = dict()
-    for key, my_set in sets:
+    for key, my_set in sets.items():
 
         set_type = None
         for element in my_set:
@@ -89,3 +89,5 @@ def infer_types(expression):
     constraints = list(expression.accept(ev, ev.fresh_type_var()))
     type_sets = unify(constraints, {})
     return name_sets(type_sets)
+
+
