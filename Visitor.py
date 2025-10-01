@@ -404,7 +404,7 @@ class CtrGenVisitor(Visitor):
 
     def visit_lth(self, lth, env):
         K0 = lth.left.accept(self, type(1))
-        K1 = lth.right.accpet(self, type(1))
+        K1 = lth.right.accept(self, type(1))
         return K0 | K1 | {(env, type(True))}
 
     def visit_eql(self, eql, env):
