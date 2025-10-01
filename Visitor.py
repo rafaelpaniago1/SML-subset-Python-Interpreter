@@ -320,3 +320,96 @@ def safe_eval(exp):
         ev2 = EvalVisitor()
         value = exp.accept(ev2, {})
         print(f"Value is {value}")
+
+
+class CtrGenVisitor(Visitor):
+
+    #No caso dessa classe, o env é o TYPE_VAR, ou seja o tipo de exp.
+    def __init__(self):
+        self.fresh_type_counter = 0 
+
+    def fresh_type_var(self):
+        self.fresh_type_counter += 1
+        variable = f"TV_{self.fresh_type_counter}"
+        return variable
+
+    def visit_var(self, var, env):
+       return {(env, var.identifier)}
+
+    def visit_num(self, num, env):
+       return {(env, type(1))} 
+
+    def visit_sub(self, sub, env):
+ 
+        K0 = sub.left.accept(self, type(1))
+        K1 = sub.right.accept(self, type(1))
+        return K0 | K1 | {(env, type(1))}       
+
+    def visit_add(self, add, env):
+ 
+        K0 = add.left.accept(self, type(1))
+        K1 = add.right.accept(self, type(1))
+        return K0 | K1 | {(env, type(1))}       
+
+    def visit_div(self, div, env):
+ 
+        K0 = div.left.accept(self, type(1))
+        K1 = div.right.accept(self, type(1))
+        return K0 | K1 | {(env, type(1))}       
+
+    def visit_mul(self, mul, env):
+
+        K0 = mul.left.accept(self, type(1))
+        K1 = mul.right.accept(self, type(1))
+        return K0 | K1 | {(env, type(1))}
+        
+    def visit_let(self, let, env):
+
+        K0 = let.exp_def.accept(self, let.identifier)
+        TV_2 = self.fresh_type_var()
+        K1 = let.exp_body.accept(self, TV_2)
+        return K0 | K1 | {(env, TV_2)}
+
+    def visit_ifThenElse(self, exp, env):
+        K0 = exp.cond.accept(self, type(True))
+        K1 = exp.e0.accept(self, env)
+        K2 = exp.e1.accept(self, env)
+        return K0 | K1 | K2
+
+    def visit_or(self, exp, env):
+        K0 = exp.left.accept(self, type(True)) 
+        K1 = exp.right.accept(self, type(True))
+        return K0 | K1 | {(env, type(True))}
+
+    def visit_bln(self, bln, env):
+        return {(env, type(True))} 
+
+    def visit_neg(self, neg, env):
+        K0 = neg.exp.accept(self, type(1))
+        return K0 | {(env, type(1))} 
+
+    def visit_not(self, not_node, env):
+        K0 = not_node.exp.accept(self, type(True)) 
+        return K0 | {(env, type(True))}
+
+    def visit_and(self, exp, env):
+        K0 = exp.left.accept(self, type(True))
+        K1 = exp.left.accept(self, type(True))
+        return K0 | K1 | {(env, type(True))}
+
+    def visit_leq(self, leq, env):
+        K0 = leq.left.accept(self, type(1))
+        K1 = leq.right.accept(self, type(1))
+        return K0 | K1 | {(env, type(True))}
+
+    def visit_lth(self, lth, env):
+        K0 = lth.left.accept(self, type(1))
+        K1 = lth.right.accpet(self, type(1))
+        return K0 | K1 | {(env, type(True))}
+
+    def visit_eql(self, eql, env):
+        TV_1 = self.fresh_type_var()
+        K0 = eql.left.accept(self, TV_1)
+        K1 = eql.right.accept(self, TV_1) 
+        return K0 | K1 | {(env, type(True))}
+
