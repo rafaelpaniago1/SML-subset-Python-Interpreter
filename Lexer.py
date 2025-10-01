@@ -97,6 +97,12 @@ class Lexer:
         if self.currChar == "/":
             self.nextChar()
             return Token("/", TokenType.DIV)
+
+        if self.source.startswith("=>", self.sourcePointer):
+            self.sourcePointer += 2
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("=>", TokenType.ARW)
+        
         if self.currChar == "=":
             self.nextChar()
             return Token("=", TokenType.EQL)
@@ -123,10 +129,6 @@ class Lexer:
             self.sourcePointer += 2 
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("fn", TokenType.FNX)
-        if self.source.startswith("=>", self.sourcePointer):
-            self.sourcePointer += 2
-            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
-            return Token("=>", TokenType.ARW)
         if self.source.startswith("true", self.sourcePointer):
             self.sourcePointer += 4
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
