@@ -1,0 +1,12 @@
+# SML Subset Interpreter Requirements
+
+# This interpreter is built with Python standard library only
+# No external dependencies required
+
+# Minimum Python version required
+python>=3.6
+
+# Optional dependencies for development (not required for running)
+# pytest>=6.0.0  # For running tests
+# black>=21.0.0  # For code formatting
+# mypy>=0.800    # For type checking
