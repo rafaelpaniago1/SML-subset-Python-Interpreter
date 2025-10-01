@@ -124,7 +124,7 @@ class Lexer:
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("fn", TokenType.FNX)
         if self.source.startswith("=>", self.sourcePointer):
-            self.sourcePointer += 205
+            self.sourcePointer += 2
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("=>", TokenType.ARW)
         if self.source.startswith("true", self.sourcePointer):
