@@ -364,6 +364,26 @@ class Or(BinaryExpression):
 
         return visitor.visit_or(self,arg)
 
+# Formal aqui é o parâmetro
+class Fn(Expression):
+
+    def __init__(self, formal, body):
+        self.formal = formal
+        self.body = body
+
+    def accept(self, visitor, arg):
+        return visitor.visit_fn(self, arg)
+
+class App(Expression):
+
+    def __init__(self, function, actual):
+        self.function = function
+        self.actual = actual
+
+    def accept(self, visitor, arg):
+
+        return visitor.visit_app(self, arg)
+
 
 
 
