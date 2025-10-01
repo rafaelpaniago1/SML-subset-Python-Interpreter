@@ -237,10 +237,11 @@ class Parser:
 
         if tok is not None and tok.kind == TokenType.FNX:
            self.advance() 
+           tok = self.curr_token()
 
            if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token")
-           arg = Var(str(tok.txt))
+           arg = Var(str(tok.text))
 
            self.advance()
            tok = self.curr_token()
