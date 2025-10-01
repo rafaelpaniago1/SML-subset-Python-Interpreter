@@ -1,3 +1,4 @@
+from sys import warnoptions
 from Expression import *
 from Lexer import Token, TokenType
 from typing import Optional
@@ -223,166 +224,265 @@ class Parser:
 
         if not self.tokens:
             raise ValueError("Cannot parse empty stream of tokens")
-        expr = self.parse_9()
+        expr = self.parse_fn_exp()
 
         tok = self.curr_token()
         if tok is not None:
             sys.exit("Parse error")
         return expr
     
-    def parse_9(self):
+    def parse_fn_exp(self):
         
         tok = self.curr_token()
 
         if tok is not None and tok.kind == TokenType.FNX:
            self.advance() 
-           arg = self.parse_9()
+
+           if tok is not None and tok.kind != TokenType.VAR:
+                sys.exit("Expected VAR token")
+           arg = tok.txt 
+
+           self.advance()
            tok = self.curr_token()
 
            if tok is not None and tok.kind != TokenType.ARW:
               raise ValueError("Expected ARW token")
 
            self.advance()
-           body = self.parse_9()
+           body = self.parse_fn_exp()
            tok = self.curr_token()
            
            return Fn(arg, body)
 
         else:
-            return self.parse_8()
+            return self.parse_if_exp()
 
 
-    def parse_8(self):
+    def parse_if_exp(self):
 
         tok = self.curr_token()
 
         if tok is not None and tok.kind == TokenType.IF:
             self.advance()
-            cond = self.parse_8()
+            cond = self.parse_if_exp()
             tok = self.curr_token()
 
             if tok is not None and tok.kind != TokenType.THEN:
                 raise ValueError("Expected THEN token")
             self.advance()
 
-            e0 = self.parse_8()
+            e0 = self.parse_fn_exp()
             tok = self.curr_token()
 
             if tok is not None and tok.kind != TokenType.ELSE:
                 raise ValueError("Expected ELSE token")
             self.advance()
 
-            e1 = self.parse_8()
+            e1 = self.parse_fn_exp()
             tok = self.curr_token()
 
             return IfThenElse(cond, e0, e1)
         else:
-            return self.parse_7()
+            return self.parse_or_exp()
 
-    def parse_7(self):
+    def parse_or_exp(self):
 
         tok = self.curr_token()
-        node = self.parse_6()
+        node = self.parse_and_exp()
         tok = self.curr_token()
         while tok is not None and tok.kind == TokenType.OR:
             self.advance()
-            node = Or(node, self.parse_6()) 
+            node = Or(node, self.parse_and_exp()) 
             tok = self.curr_token()
         return node
 
 
 
-    def parse_6(self):
+    def parse_and_exp(self):
 
         tok = self.curr_token()
-        node = self.parse_5()
+        node = self.parse_eq_exp()
         tok = self.curr_token()
         while tok is not None and tok.kind == TokenType.AND:
             self.advance()
-            node = And(node, self.parse_5()) 
+            node = And(node, self.parse_eq_exp()) 
             tok = self.curr_token()
         return node
 
 
 
-    def parse_5(self):
+    def parse_eq_exp(self):
 
         tok = self.curr_token()
-        node = self.parse_4()
+        node = self.parse_cmp_exp()
         tok = self.curr_token()
         while tok is not None and tok.kind == TokenType.EQL:
             self.advance()
-            node = Eql(node, self.parse_4())
+            node = Eql(node, self.parse_cmp_exp())
             tok = self.curr_token()
         return node
 
 
 
-    def parse_4(self):
+    def parse_cmp_exp(self):
 
         tok = self.curr_token()
-        node = self.parse_3()
+        node = self.parse_add_exp()
         tok = self.curr_token()
         while tok is not None and tok.kind in (TokenType.LTH, TokenType.LEQ):
             if tok.kind == TokenType.LTH:
 
                 self.advance()
-                node = Lth(node, self.parse_3())
+                node = Lth(node, self.parse_add_exp())
 
             elif tok.kind == TokenType.LEQ:
 
                 self.advance()
-                node = Leq(node, self.parse_3())
+                node = Leq(node, self.parse_add_exp())
 
             tok = self.curr_token()
         return node
 
 
 
-    def parse_3(self):
+    def parse_add_exp(self):
 
         tok = self.curr_token()
-        node = self.parse_2()
+        node = self.parse_mul_exp()
         tok = self.curr_token()
         while tok is not None and tok.kind in (TokenType.ADD, TokenType.SUB):
             if tok.kind == TokenType.ADD:
 
                 self.advance()
-                node = Add(node, self.parse_2())
+                node = Add(node, self.parse_mul_exp())
 
             elif tok.kind == TokenType.SUB:
 
                 self.advance()
-                node = Sub(node, self.parse_2())
+                node = Sub(node, self.parse_mul_exp())
 
             tok = self.curr_token()
         return node
 
 
 
-    def parse_2(self):
+    def parse_mul_exp(self):
 
         tok = self.curr_token()
-        node = self.parse_1()
+        node = self.parse_unary_exp()
         tok = self.curr_token()
 
         while tok is not None and tok.kind in (TokenType.MUL, TokenType.DIV):
             if tok.kind == TokenType.MUL:
 
                 self.advance()
-                node = Mul(node, self.parse_1())
+                node = Mul(node, self.parse_unary_exp())
 
             elif tok.kind == TokenType.DIV:
 
                 self.advance()
-                node = Div(node, self.parse_1())
+                node = Div(node, self.parse_unary_exp())
 
             tok = self.curr_token()
         return node
 
 
+    def parse_unary_exp(self):
 
-    def parse_1(self):
+        tok = self.curr_token()
+        if tok is not None and tok.kind in (TokenType.NEG, TokenType.NOT):
+
+            if tok.kind == TokenType.NEG:
+
+                self.advance()
+                tok = self.curr_token()
+                return Neg(self.parse_unary_exp())
+
+            elif tok.kind == TokenType.NOT:
+
+                self.advance()
+                tok = self.curr_token()
+                return Not(self.parse_unary_exp())
+        else:
+            return self.parse_let_exp()
+
+
+    def parse_let_exp(self):
+
+        tok = self.curr_token() 
+        if tok is not None and tok.kind == TokenType.LET:
+            
+            identifier = ""
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.VAR:
+                sys.exit("Parse error")
+
+            identifier = tok.text if tok is not None else ""
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.BACKARROW:
+                sys.exit("Parse error")
+
+            else:
+                self.advance()
+                tok = self.curr_token()
+            exp_def = self.parse_fn_exp()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.IN:
+                sys.exit("Parse error")
+
+            else:
+                self.advance()
+                tok = self.curr_token()
+            exp_body = self.parse_fn_exp()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.END:
+                sys.exit("Parse error")
+
+            else:
+                self.advance()
+            return Let(identifier, exp_def, exp_body)
+
+
+        else:
+            return self.parse_val_exp()
+    
+    def parse_val_exp(self):
+
+        tok = self.curr_token()
+        node = self.parse_val_tk() 
+        tok = self.curr_token()
+        while tok is not None and tok.kind in (TokenType.VAR, TokenType.LPR, TokenType.INT, TokenType.OCT, TokenType.BIN, TokenType.HEX, TokenType.FLS, TokenType.TRU):
+            node = App(node, self.parse_val_tk())
+            tok = self.curr_token()
+        return node
+
+    def parse_val_tk(self):
+
+        tok = self.curr_token()
+        if tok is not None and tok.kind in (TokenType.HEX, TokenType.BIN, TokenType.INT, TokenType.OCT):
+            self.advance()
+            return Num(int(tok.text, 0))
+
+        elif tok is not None and tok.kind in (TokenType.FLS, TokenType.TRU):
+            self.advance()
+            return Bln(tok.kind == TokenType.TRU) 
+
+        elif tok is not None and tok.kind == TokenType.LPR:
+            self.advance()
+            exp = self.parse_fn_exp()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.RPR:
+                sys.exit("Parse error")
+            self.advance()
+            return exp
+        elif tok is not None and tok.kind == TokenType.VAR:
+            self.advance()
+            return Var(tok.text) 
+
+
+    def parse_teste(self):
 
         tok = self.curr_token()
         if tok is not None and tok.kind in (TokenType.HEX, TokenType.BIN, TokenType.INT, TokenType.OCT):
@@ -406,7 +506,7 @@ class Parser:
             else:
                 self.advance()
                 tok = self.curr_token()
-            exp_def = self.parse_8()
+            exp_def = self.parse_if_exp()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.IN:
                 sys.exit("Parse error")
@@ -414,7 +514,7 @@ class Parser:
             else:
                 self.advance()
                 tok = self.curr_token()
-            exp_body = self.parse_8()
+            exp_body = self.parse_if_exp()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.END:
                 sys.exit("Parse error")
@@ -428,7 +528,7 @@ class Parser:
             return Bln(tok.kind == TokenType.TRU) 
         elif tok is not None and tok.kind == TokenType.LPR:
             self.advance()
-            exp = self.parse_8()
+            exp = self.parse_if_exp()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.RPR:
                 sys.exit("Parse error")
@@ -441,10 +541,10 @@ class Parser:
         #Think about how to parse this
         elif tok is not None and tok.kind == TokenType.NEG:
             self.advance()
-            return Neg(self.parse_1())
+            return Neg(self.parse_teste())
         elif tok is not None and tok.kind == TokenType.NOT:
             self.advance()
-            return Not(self.parse_1())
+            return Not(self.parse_teste())
         else:
             sys.exit("Parse error")
 
