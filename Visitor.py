@@ -226,6 +226,21 @@ class EvalVisitor(Visitor):
         else:
             return exp.e1.accept(self, env)
 
+    #Recebe o env de fora
+    def visit_function(self, exp, env):
+        return Function(exp.formal, exp.body, env)
+    
+    def visit_app(self, exp, env):
+
+        e1 = exp.function.accept(self, env)
+        if not isinstance(e1, Function):
+            sys.exit("Type Error") 
+
+        e2 = exp.actual.accept(self, env)
+
+        new_env = env
+        new_env[e1.formal] = e2
+        return e1.body.accept(self, new_env)
 
 class UseDefVisitor(Visitor):
     """
