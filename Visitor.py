@@ -19,7 +19,7 @@ class RecFunction(Function):
         self.name = name
 
     def __str__(self):
-        return f"Fun {self.name} ({self.formal})"
+        return f"Fun {self.name.identifier} ({self.formal.identifier})"
 
 class Visitor(ABC):
     """
@@ -86,6 +86,9 @@ class Visitor(ABC):
         pass
     @abstractmethod
     def visit_rec_fun(self, exp, env):
+        pass
+    @abstractmethod
+    def visit_mod(self, exp, env):
         pass
 
 class EvalVisitor(Visitor):
@@ -200,7 +203,7 @@ class EvalVisitor(Visitor):
     def visit_let(self, let, env):
         definition_value = let.exp_def.accept(self, env)
         new_env = env.copy()
-        new_env[let.identifier] = definition_value
+        new_env[let.identifier.identifier] = definition_value
         return let.exp_body.accept(self, new_env) 
     
     def visit_and(self, exp, env):
@@ -257,9 +260,17 @@ class EvalVisitor(Visitor):
         new_env[function_value.formal.identifier] = parameter_value 
 
         if isinstance(function_value, RecFunction):
-            new_env[function_value.name] = function_value
+            new_env[function_value.name.identifier] = function_value
 
         return function_value.body.accept(self, new_env)
+
+    def visit_mod(self, exp, env):
+        left = exp.left.accept(self, env)
+        right = exp.right.accept(self, env)
+        if type(left) == type(1) and type(right == type(1)):
+            return left % right
+        else:
+            sys.exit("Type error")
 
 class UseDefVisitor(Visitor):
     """
@@ -355,6 +366,9 @@ class UseDefVisitor(Visitor):
         pass
 
     def visit_rec_fun(self, exp, env):
+        pass
+
+    def visit_mod(self, exp, env):
         pass
 
 def safe_eval(exp):
@@ -483,5 +497,8 @@ class CtrGenVisitor(Visitor):
         #IMPLEMENTAR ISSO AQUI DEPOIS
 
     def visit_rec_fun(self, exp, env):
+        pass
+
+    def visit_mod(self, exp, env):
         pass
 
