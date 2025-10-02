@@ -304,8 +304,9 @@ class Let(Expression):
     1. Evaluate e0 in the environment env, yielding e0_val
     2. Evaluate e1 in the new environment env' = env + {v:e0_val}
     """
-    def __init__(self, identifier, exp_def, exp_body):
+    def __init__(self, identifier, tp_var, exp_def, exp_body):
         self.identifier = identifier
+        self.tp_var = tp_var
         self.exp_def = exp_def
         self.exp_body = exp_body
     def accept(self, visitor, arg):
@@ -372,8 +373,9 @@ class Or(BinaryExpression):
 # Formal aqui é o parâmetro
 class Fn(Expression):
 
-    def __init__(self, formal, body):
+    def __init__(self, formal, tp_var, body):
         self.formal = formal
+        self.tp_var = tp_var
         self.body = body
 
     def accept(self, visitor, arg):
@@ -391,8 +393,8 @@ class App(Expression):
 
 class Fun(Fn):
 
-    def __init__(self, name, formal, body):
-        super().__init__(formal, body)
+    def __init__(self, name, formal, tp_var, body):
+        super().__init__(formal, tp_var, body)
         self.name = name
 
     def accept(self, visitor, arg):
