@@ -384,6 +384,11 @@ class Parser:
                 self.advance()
                 node = Div(node, self.parse_unary_exp())
 
+            elif tok.kind == TokenType.MOD:
+
+                self.advance()
+                node = Mod(node, self.parse_unary_exp())
+
             tok = self.curr_token()
         return node
 
