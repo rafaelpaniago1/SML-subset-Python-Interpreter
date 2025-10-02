@@ -247,15 +247,15 @@ class EvalVisitor(Visitor):
     
     def visit_app(self, exp, env):
 
-        e1 = exp.function.accept(self, env)
-        if not isinstance(e1, Function):
+        function_value = exp.function.accept(self, env)
+        if not isinstance(function_value, Function):
             sys.exit("Type Error") 
 
-        e2 = exp.actual.accept(self, env)
+        parameter_value = exp.actual.accept(self, env)
 
-        new_env = e1.env.copy()
-        new_env[e1.formal.identifier] = e2
-        return e1.body.accept(self, new_env)
+        new_env = function_value.env.copy()
+        new_env[function_value.formal.identifier] = parameter_value 
+        return function_value.body.accept(self, new_env)
 
 class UseDefVisitor(Visitor):
     """
