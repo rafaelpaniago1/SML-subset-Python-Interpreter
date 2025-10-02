@@ -25,7 +25,7 @@ class Parser:
         Returns the expression associated with the stream of tokens.
 
         Examples:
-        >>> parser = Parser([Token('123', TokenType.INT)])
+        >>> parser = Parser([Token('123', TokenType.NUM)])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
@@ -44,65 +44,65 @@ class Parser:
         False
 
         >>> tk0 = Token('~', TokenType.NEG)
-        >>> tk1 = Token('123', TokenType.INT)
+        >>> tk1 = Token('123', TokenType.NUM)
         >>> parser = Parser([tk0, tk1])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         -123
 
-        >>> tk0 = Token('3', TokenType.INT)
+        >>> tk0 = Token('3', TokenType.NUM)
         >>> tk1 = Token('*', TokenType.MUL)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         12
 
-        >>> tk0 = Token('3', TokenType.INT)
+        >>> tk0 = Token('3', TokenType.NUM)
         >>> tk1 = Token('*', TokenType.MUL)
         >>> tk2 = Token('~', TokenType.NEG)
-        >>> tk3 = Token('4', TokenType.INT)
+        >>> tk3 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2, tk3])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         -12
 
-        >>> tk0 = Token('30', TokenType.INT)
+        >>> tk0 = Token('30', TokenType.NUM)
         >>> tk1 = Token('/', TokenType.DIV)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         7
 
-        >>> tk0 = Token('3', TokenType.INT)
+        >>> tk0 = Token('3', TokenType.NUM)
         >>> tk1 = Token('+', TokenType.ADD)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         7
 
-        >>> tk0 = Token('30', TokenType.INT)
+        >>> tk0 = Token('30', TokenType.NUM)
         >>> tk1 = Token('-', TokenType.SUB)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         26
 
-        >>> tk0 = Token('2', TokenType.INT)
+        >>> tk0 = Token('2', TokenType.NUM)
         >>> tk1 = Token('*', TokenType.MUL)
         >>> tk2 = Token('(', TokenType.LPR)
-        >>> tk3 = Token('3', TokenType.INT)
+        >>> tk3 = Token('3', TokenType.NUM)
         >>> tk4 = Token('+', TokenType.ADD)
-        >>> tk5 = Token('4', TokenType.INT)
+        >>> tk5 = Token('4', TokenType.NUM)
         >>> tk6 = Token(')', TokenType.RPR)
         >>> parser = Parser([tk0, tk1, tk2, tk3, tk4, tk5, tk6])
         >>> exp = parser.parse()
@@ -110,27 +110,27 @@ class Parser:
         >>> exp.accept(ev, None)
         14
 
-        >>> tk0 = Token('4', TokenType.INT)
+        >>> tk0 = Token('4', TokenType.NUM)
         >>> tk1 = Token('==', TokenType.EQL)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         True
 
-        >>> tk0 = Token('4', TokenType.INT)
+        >>> tk0 = Token('4', TokenType.NUM)
         >>> tk1 = Token('<=', TokenType.LEQ)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
         >>> exp.accept(ev, None)
         True
 
-        >>> tk0 = Token('4', TokenType.INT)
+        >>> tk0 = Token('4', TokenType.NUM)
         >>> tk1 = Token('<', TokenType.LTH)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
@@ -139,9 +139,9 @@ class Parser:
 
         >>> tk0 = Token('not', TokenType.NOT)
         >>> tk1 = Token('(', TokenType.LPR)
-        >>> tk2 = Token('4', TokenType.INT)
+        >>> tk2 = Token('4', TokenType.NUM)
         >>> tk3 = Token('<', TokenType.LTH)
-        >>> tk4 = Token('4', TokenType.INT)
+        >>> tk4 = Token('4', TokenType.NUM)
         >>> tk5 = Token(')', TokenType.RPR)
         >>> parser = Parser([tk0, tk1, tk2, tk3, tk4, tk5])
         >>> exp = parser.parse()
@@ -170,7 +170,7 @@ class Parser:
         >>> tk0 = Token('let', TokenType.LET)
         >>> tk1 = Token('v', TokenType.VAR)
         >>> tk2 = Token('<-', TokenType.BACKARROW)
-        >>> tk3 = Token('42', TokenType.INT)
+        >>> tk3 = Token('42', TokenType.NUM)
         >>> tk4 = Token('in', TokenType.IN)
         >>> tk5 = Token('v', TokenType.VAR)
         >>> tk6 = Token('end', TokenType.END)
@@ -183,7 +183,7 @@ class Parser:
         >>> tk0 = Token('let', TokenType.LET)
         >>> tk1 = Token('v', TokenType.VAR)
         >>> tk2 = Token('<-', TokenType.BACKARROW)
-        >>> tk3 = Token('21', TokenType.INT)
+        >>> tk3 = Token('21', TokenType.NUM)
         >>> tk4 = Token('in', TokenType.IN)
         >>> tk5 = Token('v', TokenType.VAR)
         >>> tk6 = Token('+', TokenType.ADD)
@@ -196,13 +196,13 @@ class Parser:
         42
 
         >>> tk0 = Token('if', TokenType.IF)
-        >>> tk1 = Token('2', TokenType.INT)
+        >>> tk1 = Token('2', TokenType.NUM)
         >>> tk2 = Token('<', TokenType.LTH)
-        >>> tk3 = Token('3', TokenType.INT)
+        >>> tk3 = Token('3', TokenType.NUM)
         >>> tk4 = Token('then', TokenType.THEN)
-        >>> tk5 = Token('1', TokenType.INT)
+        >>> tk5 = Token('1', TokenType.NUM)
         >>> tk6 = Token('else', TokenType.ELSE)
-        >>> tk7 = Token('2', TokenType.INT)
+        >>> tk7 = Token('2', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2, tk3, tk4, tk5, tk6, tk7])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
@@ -212,9 +212,9 @@ class Parser:
         >>> tk0 = Token('if', TokenType.IF)
         >>> tk1 = Token('false', TokenType.FLS)
         >>> tk2 = Token('then', TokenType.THEN)
-        >>> tk3 = Token('1', TokenType.INT)
+        >>> tk3 = Token('1', TokenType.NUM)
         >>> tk4 = Token('else', TokenType.ELSE)
-        >>> tk5 = Token('2', TokenType.INT)
+        >>> tk5 = Token('2', TokenType.NUM)
         >>> parser = Parser([tk0, tk1, tk2, tk3, tk4, tk5])
         >>> exp = parser.parse()
         >>> ev = EvalVisitor()
@@ -445,7 +445,7 @@ class Parser:
         tok = self.curr_token()
         node = self.parse_val_tk() 
         tok = self.curr_token()
-        while tok is not None and tok.kind in (TokenType.VAR, TokenType.LPR, TokenType.INT, TokenType.OCT, TokenType.BIN, TokenType.HEX, TokenType.FLS, TokenType.TRU):
+        while tok is not None and tok.kind in (TokenType.VAR, TokenType.LPR, TokenType.NUM, TokenType.OCT, TokenType.BIN, TokenType.HEX, TokenType.FLS, TokenType.TRU):
             node = App(node, self.parse_val_tk())
             tok = self.curr_token()
         return node
@@ -453,7 +453,7 @@ class Parser:
     def parse_val_tk(self):
 
         tok = self.curr_token()
-        if tok is not None and tok.kind in (TokenType.HEX, TokenType.BIN, TokenType.INT, TokenType.OCT):
+        if tok is not None and tok.kind in (TokenType.HEX, TokenType.BIN, TokenType.NUM, TokenType.OCT):
             self.advance()
             return Num(int(tok.text, 0))
 
