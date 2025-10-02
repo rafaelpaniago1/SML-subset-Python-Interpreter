@@ -418,22 +418,9 @@ class Parser:
         tok = self.curr_token() 
         if tok is not None and tok.kind == TokenType.LET:
             
-            identifier = ""
             self.advance()
             tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.VAR:
-                sys.exit("Parse error")
-
-            identifier = tok.text if tok is not None else ""
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.BACKARROW:
-                sys.exit("Parse error")
-
-            else:
-                self.advance()
-                tok = self.curr_token()
-            exp_def = self.parse_fn_exp()
+            identifier, exp_def = self.parse_decl() 
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.IN:
                 sys.exit("Parse error")
@@ -449,7 +436,6 @@ class Parser:
             else:
                 self.advance()
             return Let(identifier, exp_def, exp_body)
-
 
         else:
             return self.parse_val_exp()
@@ -487,4 +473,40 @@ class Parser:
             self.advance()
             return Var(tok.text) 
 
+    def parse_decl(self):
+       
+        tok = self.curr_token()
+        if tok is not None and tok.kind == TokenType.VAL:
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.VAR:
+                sys.exit("Expected VAR token")
+            var = Var(str(tok.text))
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.EQL:
+                sys.exit("Expected EQL token")
+            self.advance()
+            value = self.parse_fn_exp()
+            return (var, value)
+
+        elif tok is not None and tok.kind == TokenType.FUN:
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.VAR:
+                sys.exit("Expected VAR token(name of rec function)")
+            name = Var(str(tok.text))
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.VAR:
+                sys.exit("Expected VAR token(parameter of rec function)")
+            formal = Var(str(tok.text))
+            self.advance()
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.EQL:
+                sys.exit("Expected EQL token in recursive function declaration")
+            self.advance()
+            tok = self.curr_token()
+            body = self.parse_fn_exp()
+            return (name, Fun(name, formal, body))
 
