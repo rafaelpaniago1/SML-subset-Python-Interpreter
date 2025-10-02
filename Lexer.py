@@ -45,6 +45,10 @@ class TokenType(enum.Enum):
     MOD = 224
     FUN = 225
     VAL = 226
+    NUM = 227
+    TPF = 228
+    COL = 229
+    LGC = 230
 
 
 class Lexer:
@@ -83,6 +87,27 @@ class Lexer:
         if self.currChar == "+":
             self.nextChar()
             return Token("+", TokenType.ADD)
+
+        if self.source.startswith("->", self.sourcePointer):
+            self.sourcePointer += 2
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("->", TokenType.TPF)
+
+        if self.source.startswith(":", self.sourcePointer):
+            self.sourcePointer += 1 
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token(":", TokenType.COL) 
+
+        if self.source.startswith("int", self.sourcePointer):
+            self.sourcePointer += 3 
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("int", TokenType.INT)
+
+        if self.source.startswith("bool", self.sourcePointer):
+            self.sourcePointer += 4 
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("bool", TokenType.LGC)
+        
         if self.currChar == "-":
             self.nextChar()
             # check comment
@@ -213,12 +238,12 @@ class Lexer:
                         text += self.currChar
                         self.nextChar()
                     return Token(text, TokenType.OCT)
-                return Token("0", TokenType.INT)
+                return Token("0", TokenType.NUM)
             else:
                 while self.currChar is not None and self.currChar.isdigit():
                     text += self.currChar
                     self.nextChar()
-                return Token(text, TokenType.INT)
+                return Token(text, TokenType.NUM)
 
         if self.currChar.isalpha():
             text = self.currChar
