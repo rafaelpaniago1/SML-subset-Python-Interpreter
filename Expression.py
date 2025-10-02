@@ -387,9 +387,8 @@ class App(Expression):
 class Fun(Fn):
 
     def __init__(self, name, formal, body):
+        super().__init__(formal, body)
         self.name = name
-        self.formal = formal
-        self.body = body
 
     def accept(self, visitor, arg):
         return visitor.visit_rec_fun(self, arg)
