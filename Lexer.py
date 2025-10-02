@@ -43,6 +43,8 @@ class TokenType(enum.Enum):
     FNX = 222
     ARW = 223
     MOD = 224
+    FUN = 225
+    VAL = 226
 
 
 class Lexer:
@@ -103,6 +105,14 @@ class Lexer:
             self.sourcePointer += 3
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("mod", TokenType.MOD)
+        if self.source.startswith("fun", self.sourcePointer):
+            self.sourcePointer += 3
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("fun", TokenType.FUN)
+        if self.source.startswith("val", self.sourcePointer):
+            self.sourcePointer += 3
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("val", TokenType.VAL)
 
         if self.source.startswith("=>", self.sourcePointer):
             self.sourcePointer += 2
