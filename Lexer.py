@@ -42,6 +42,7 @@ class TokenType(enum.Enum):
     AND = 221
     FNX = 222
     ARW = 223
+    MOD = 224
 
 
 class Lexer:
@@ -98,6 +99,10 @@ class Lexer:
             self.sourcePointer += 3
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
             return Token("div", TokenType.DIV)
+        if self.source.startswith("mod", self.sourcePointer):
+            self.sourcePointer += 3
+            self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
+            return Token("mod", TokenType.MOD)
 
         if self.source.startswith("=>", self.sourcePointer):
             self.sourcePointer += 2
