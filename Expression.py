@@ -384,6 +384,18 @@ class App(Expression):
 
         return visitor.visit_app(self, arg)
 
+class Fun(Fn):
+
+    def __init__(self, name, formal, body):
+        self.name = name
+        self.formal = formal
+        self.body = body
+
+    def accept(self, visitor, arg):
+        return visitor.visit_rec_fun(self, arg)
+
+
+
 
 
 
