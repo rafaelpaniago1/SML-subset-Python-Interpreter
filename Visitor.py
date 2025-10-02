@@ -84,6 +84,9 @@ class Visitor(ABC):
     @abstractmethod
     def visit_app(self, exp, env):
         pass
+    @abstractmethod
+    def visit_rec_fun(self, exp, env):
+        pass
 
 class EvalVisitor(Visitor):
     """
@@ -238,6 +241,9 @@ class EvalVisitor(Visitor):
     #Recebe o env de fora
     def visit_function(self, exp, env):
         return Function(exp.formal, exp.body, env)
+
+    def visit_rec_fun(self, exp, env):
+        return RecFunction(exp.name, exp.formal, exp.body, env)
     
     def visit_app(self, exp, env):
 
@@ -342,6 +348,9 @@ class UseDefVisitor(Visitor):
 
     def visit_function(self, exp, env):
         #IMPLEMENTAR DEPOIS
+        pass
+
+    def visit_rec_fun(self, exp, env):
         pass
 
 def safe_eval(exp):
@@ -468,4 +477,7 @@ class CtrGenVisitor(Visitor):
     def visit_function(self, exp, env):
         pass
         #IMPLEMENTAR ISSO AQUI DEPOIS
+
+    def visit_rec_fun(self, exp, env):
+        pass
 
