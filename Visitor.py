@@ -255,6 +255,10 @@ class EvalVisitor(Visitor):
 
         new_env = function_value.env.copy()
         new_env[function_value.formal.identifier] = parameter_value 
+
+        if isinstance(function_value, RecFunction):
+            new_env[function_value.name] = function_value
+
         return function_value.body.accept(self, new_env)
 
 class UseDefVisitor(Visitor):
