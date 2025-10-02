@@ -373,7 +373,7 @@ class Parser:
         node = self.parse_unary_exp()
         tok = self.curr_token()
 
-        while tok is not None and tok.kind in (TokenType.MUL, TokenType.DIV):
+        while tok is not None and tok.kind in (TokenType.MUL, TokenType.DIV, TokenType.MOD):
             if tok.kind == TokenType.MUL:
 
                 self.advance()
