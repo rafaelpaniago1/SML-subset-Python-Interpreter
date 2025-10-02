@@ -238,6 +238,11 @@ class Lth(BinaryExpression):
         """
         return visitor.visit_lth(self, arg)
 
+class Mod(BinaryExpression):
+
+    def accept(self, visitor, arg):
+        return visitor.visit_mod(self, arg)
+
 class UnaryExpression(Expression):
     """
     This class represents unary expressions. A unary expression has only one
