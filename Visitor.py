@@ -12,6 +12,15 @@ class Function():
     def __str__(self):
         return f"Fn({self.formal.identifier})"
 
+class RecFunction(Function):
+
+    def __init__(self, name, formal, body, env):
+        super().__init__(formal, body, env)
+        self.name = name
+
+    def __str__(self):
+        return f"Fun {self.name} ({self.formal})"
+
 class Visitor(ABC):
     """
     The visitor pattern consists of two abstract classes: the Expression and the
