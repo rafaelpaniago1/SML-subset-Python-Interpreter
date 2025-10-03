@@ -81,11 +81,32 @@ not false                   # => True
 5 < 10                      # => True
 ```
 
-### Funções
+### Funções Anônimas
 ```sml
 fn x => x + 1                       # => Fn(x)
 (fn x => x * x) 5                   # => 25
 (fn x => fn y => x + y) 3 2         # => 5
+```
+
+### Funções Recursivas 🔥
+```sml
+fun factorial n => 
+  if n <= 1 then 1 
+  else n * factorial (n - 1)
+
+factorial 5                         # => 120
+
+fun fibonacci n =>
+  if n <= 1 then n
+  else fibonacci (n - 1) + fibonacci (n - 2)
+
+fibonacci 8                         # => 21
+
+fun power base exp =>
+  if exp = 0 then 1
+  else base * power base (exp - 1)
+
+power 3 4                           # => 81
 ```
 
 ### Let Expressions
@@ -100,7 +121,7 @@ if 2 < 3 then 100 else 200          # => 100
 if true then (fn x => x) else (fn y => y + 1)  # => Fn(x)
 ```
 
-### Complexo (Closures e Funções de Ordem Superior)
+### Complexo (Closures, Funções de Ordem Superior e Recursão)
 ```sml
 let
   sqr <- fn x => x * x
@@ -111,6 +132,21 @@ in
     (twice sqr) 3
   end
 end                                  # => 81
+
+fun sum_range start finish =>
+  if start > finish then 0
+  else start + sum_range (start + 1) finish
+
+sum_range 1 10                       # => 55
+
+# Combinando let e fun
+let
+  factorial <- fun fact n =>
+    if n <= 1 then 1
+    else n * fact (n - 1)
+in
+  factorial 6
+end                                  # => 720
 ```
 
 ## Estrutura de Arquivos
@@ -124,10 +160,13 @@ SML-subset-Python-Interpreter/
 ├── README.md           # Documentação completa
 ├── examples/           # Exemplos de código SML
 │   ├── basic.sml      # Operações básicas
-│   ├── functions.sml  # Funções
+│   ├── functions.sml  # Funções anônimas
+│   ├── recursive.sml  # 🔥 Funções recursivas simples
+│   ├── advanced_recursive.sml # 🔥 Funções recursivas avançadas
 │   ├── conditionals.sml # Condicionais
 │   ├── let_expressions.sml # Let expressions
 │   └── complex.sml    # Exemplos avançados
+├── USAGE.md           # Este guia
 └── driver.py          # Script original (para testes acadêmicos)
 ```
 
@@ -148,6 +187,9 @@ SML-subset-Python-Interpreter/
 2. **Para debug**: Use `python3 sml.py -v arquivo.sml` (modo verboso)
 3. **Para aprender**: Execute `python3 run_examples.py` para ver vários exemplos
 4. **Para desenvolver**: Crie arquivos `.sml` e execute com `python3 sml.py arquivo.sml`
+5. **🔥 Para funções recursivas**: Use `fun nome parâmetro => corpo` em vez de `fn`
+6. **Para checagem de tipos**: O sistema detecta automaticamente erros de tipo
+7. **Para funções complexas**: Combine `let`, `fun` e closures para algoritmos avançados
 
 ## Solução de Problemas
 

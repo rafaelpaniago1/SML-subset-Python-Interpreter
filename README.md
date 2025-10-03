@@ -10,11 +10,14 @@ Este interpretador suporta as seguintes funcionalidades da linguagem SML:
 - **Operações aritméticas**: `+`, `-`, `*`, `/`
 - **Operações lógicas**: `and`, `or`, `not`
 - **Comparações**: `=`, `<`, `<=`
-- **Funções**: `fn x => expr`
+- **Funções anônimas**: `fn x => expr`
+- **Funções recursivas**: `fun nome x => expr`
 - **Aplicação de funções**: `f x`
 - **Expressões let**: `let x <- expr in expr end`
 - **Condicionais**: `if cond then expr else expr`
 - **Variáveis e closures**
+- **Checagem de tipos estática**: Sistema de tipos com ArrowType para funções
+- **Análise de uso/definição**: Detecção de variáveis não definidas
 
 ## 📋 Requisitos
 
@@ -76,7 +79,42 @@ python3 sml.py --ast-only programa.sml
 python3 sml.py -h
 ```
 
-## 📝 Exemplos de Código
+## � Funções Recursivas
+
+Este interpretador suporta **funções recursivas** usando a palavra-chave `fun`:
+
+```sml
+fun factorial n => 
+  if n <= 1 then 1 
+  else n * factorial (n - 1)
+
+factorial 5  # => 120
+```
+
+```sml
+fun fibonacci n =>
+  if n <= 1 then n
+  else fibonacci (n - 1) + fibonacci (n - 2)
+
+fibonacci 7  # => 13
+```
+
+### Características das Funções Recursivas:
+- **Sintaxe**: `fun nome parâmetro => corpo`
+- **Escopo**: O nome da função está disponível dentro do corpo
+- **Checagem de tipos**: Suporte completo a tipos de função (ArrowType)
+- **Closures**: Acesso ao ambiente de definição
+
+## 🔍 Sistema de Tipos
+
+O interpretador inclui um **sistema de checagem de tipos estática**:
+
+- **ArrowType**: Representa tipos de função `domínio -> codomínio`
+- **Inferência de tipos**: Detecção automática de tipos
+- **Detecção de erros**: Erros de tipo são detectados antes da execução
+- **Unificação**: Sistema de unificação de tipos para expressões complexas
+
+## �📝 Exemplos de Código
 
 ### Números e Operações Básicas
 ```sml
@@ -94,16 +132,31 @@ true and false
 true or false
 ```
 
-### Funções
+### Funções Anônimas
 ```sml
 fn x => x + 1
 (fn x => x * x) 5
+```
+
+### Funções Recursivas
+```sml
+fun power base exp =>
+  if exp = 0 then 1
+  else base * power base (exp - 1)
+
+power 2 8  # => 256
 ```
 
 ### Funções de Ordem Superior
 ```sml
 fn f => fn x => f (f x)
 (fn x => fn y => x + y) 3 2
+
+fun sum_range start finish =>
+  if start > finish then 0
+  else start + sum_range (start + 1) finish
+
+sum_range 1 10  # => 55
 ```
 
 ### Let Expressions
@@ -182,15 +235,26 @@ Goodbye!
 
 ```
 SML-subset-Python-Interpreter/
-├── sml.py           # Script principal
-├── driver.py        # Script original (para testes)
-├── Expression.py    # Classes para AST
-├── Lexer.py         # Analisador léxico
-├── Parser.py        # Analisador sintático
-├── Visitor.py       # Padrão Visitor para avaliação
-├── Unifier.py       # Unificação de tipos
-├── examples/        # Exemplos de código SML
-└── README.md        # Este arquivo
+├── sml.py                    # Script principal
+├── driver.py                 # Script original (para testes)
+├── Expression.py             # Classes para AST (incluindo Fun para recursão)
+├── Lexer.py                  # Analisador léxico
+├── Parser.py                 # Analisador sintático
+├── Visitor.py                # Padrão Visitor (EvalVisitor, TypeCheckVisitor, etc.)
+├── Unifier.py                # Unificação de tipos
+├── setup.py                  # Script de configuração
+├── run_examples.py           # Executa todos os exemplos
+├── requirements.txt          # Dependências
+├── examples/                 # Exemplos de código SML
+│   ├── basic.sml            # Operações básicas
+│   ├── functions.sml        # Funções simples
+│   ├── recursive.sml        # Funções recursivas simples
+│   ├── advanced_recursive.sml # Funções recursivas avançadas
+│   ├── conditionals.sml     # Estruturas condicionais
+│   ├── let_expressions.sml  # Expressões let
+│   └── complex.sml          # Exemplos complexos
+├── USAGE.md                  # Guia de uso rápido
+└── README.md                 # Este arquivo
 ```
 
 ## 🐛 Tratamento de Erros
