@@ -525,3 +525,169 @@ class CtrGenVisitor(Visitor):
     def visit_mod(self, exp, env):
         pass
 
+class TypeCheckVisitor(Visitor):
+
+    def visit_var(self, var, env):
+        return env[var]
+
+    def visit_num(self, num, env):
+        return type(1)
+
+    def visit_sub(self, sub, env):
+
+        left = sub.left.accept(self, env)
+        right = sub.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(1)
+        else:
+            raise TypeError("Erro de tipo")
+
+    def visit_add(self, add, env):
+        left = add.left.accept(self, env)
+        right = add.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(1)
+        else:
+            raise TypeError("Erro de tipo")
+
+
+    def visit_div(self, div, env):
+        left = div.left.accept(self, env)
+        right = div.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(1)
+        else:
+            raise TypeError("Erro de tipo")
+
+
+    def visit_mul(self, mul, env):
+        left = mul.left.accept(self, env)
+        right = mul.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(1)
+        else:
+            raise TypeError("Erro de tipo")
+
+       
+    def visit_let(self, let, env):
+
+        typeE0 = let.exp_def.accept(self, env)
+        if typeE0 != let.tp_var:
+            raise TypeError("Erro de tipo")
+        new_env = env.copy()
+        new_env[let.identifier] = typeE0
+        typeE1 = let.exp_body.accept(self, new_env)
+        return typeE1
+
+
+    def visit_ifThenElse(self, exp, env):
+        cond = exp.cond.accept(self, env)
+        e0 = exp.e0.accept(self, env)
+        e1 = exp.e1.accept(self, env)
+
+        if not isinstance(cond, type(True)):
+            raise TypeError("Erro de tipo")
+
+        if e0 != e1:
+            raise TypeError("Erro de tipo")
+
+        return e0
+
+    def visit_or(self, exp, env):
+        left = exp.left.accept(self, env)
+        right = exp.right.accept(self, env)
+        if isinstance(left, type(True)) and isinstance(right, type(True)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+
+    def visit_bln(self, bln, env):
+        bln = bln.bln
+        if isinstance(bln, type(True)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+    def visit_not(self,not_node, env):
+        value = not_node.exp.accept(self, env)
+        if isinstance(value, type(True)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+    def visit_neg(self, neg, env):
+        value = neg.exp.accept(self, env)
+        if isinstance(value, type(1)):
+            return type(1)
+        else:
+            raise TypeError("Erro de tipo")
+
+    def visit_and(self, exp, env):
+        left = exp.left.accept(self, env)
+        right = exp.right.accept(self, env)
+        if isinstance(left, type(True)) and isinstance(right, type(True)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+    def visit_leq(self, leq, env):
+        left = leq.left.accept(self, env)
+        right = leq.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+
+    def visit_lth(self, lth, env):
+        left = lth.left.accept(self, env)
+        right = lth.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+
+    def visit_eql(self, eql, env):
+        left = eql.left.accept(self, env)
+        right = eql.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(True)
+        else:
+            raise TypeError("Erro de tipo")
+
+
+    def visit_app(self, exp, env):
+
+        function_type = exp.function.accept(self, env)
+        actual_type = exp.function.accept(self, env)
+        
+        if not isinstance(function_type, ArrowType):
+            raise TypeError("Erro de tipo")
+
+        if not isinstance(actual_type, function_type.hd):
+            raise TypeError("Erro de tipo")
+            
+        return function_type.tl
+
+    def visit_function(self, exp, env):
+
+        new_env = env.copy()
+        new_env[exp.formal] = exp.tp_var
+
+        body_type = exp.body.accept(self, new_env)
+
+        return ArrowType(exp.tp_var, body_type)
+
+    def visit_rec_fun(self, exp, env):
+        #NAO IMPLEMENTAR
+
+    def visit_mod(self, exp, env):
+        left = exp.left.accept(self, env)
+        right = exp.right.accept(self, env)
+        if isinstance(left, type(1)) and isinstance(right, type(1)):
+            return type(1)
+        else:
+            raise TypeError("Erro de tipo")
+
