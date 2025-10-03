@@ -10,7 +10,7 @@ class Function():
         self.env = env
 
     def __str__(self):
-        return f"Fn({self.formal.identifier})"
+        return f"Fn({self.formal})"
 
 class RecFunction(Function):
 
@@ -19,7 +19,7 @@ class RecFunction(Function):
         self.name = name
 
     def __str__(self):
-        return f"Fun {self.name.identifier} ({self.formal.identifier})"
+        return f"Fun {self.name} ({self.formal})"
 
 class Visitor(ABC):
     """
@@ -203,7 +203,7 @@ class EvalVisitor(Visitor):
     def visit_let(self, let, env):
         definition_value = let.exp_def.accept(self, env)
         new_env = env.copy()
-        new_env[let.identifier.identifier] = definition_value
+        new_env[let.identifier] = definition_value
         return let.exp_body.accept(self, new_env) 
     
     def visit_and(self, exp, env):
@@ -257,10 +257,10 @@ class EvalVisitor(Visitor):
         parameter_value = exp.actual.accept(self, env)
 
         new_env = function_value.env.copy()
-        new_env[function_value.formal.identifier] = parameter_value 
+        new_env[function_value.formal] = parameter_value 
 
         if isinstance(function_value, RecFunction):
-            new_env[function_value.name.identifier] = function_value
+            new_env[function_value.name] = function_value
 
         return function_value.body.accept(self, new_env)
 
