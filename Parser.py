@@ -2,6 +2,7 @@ from sys import warnoptions
 from Expression import *
 from Lexer import Token, TokenType
 from typing import Optional
+from Visitor import ArrowType 
 
 class Parser:
     
@@ -241,19 +242,26 @@ class Parser:
 
            if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token")
-           arg = str(tok.text)
+           formal = str(tok.text)
 
            self.advance()
            tok = self.curr_token()
 
+           if tok is not None and tok.kind != TokenType.COL:
+              raise SyntaxError("Expected colom token") 
+            
+           self.advance()
+           tp_var = self.parse_types()
+
+           tok = self.curr_token()
            if tok is not None and tok.kind != TokenType.ARW:
-              raise ValueError("Expected ARW token")
+              raise SyntaxError("Expected ARW token")
 
            self.advance()
            body = self.parse_fn_exp()
            tok = self.curr_token()
            
-           return Fn(arg, body)
+           return Fn(formal, tp_var, body)
 
         else:
             return self.parse_if_exp()
@@ -420,22 +428,39 @@ class Parser:
             
             self.advance()
             tok = self.curr_token()
-            identifier, exp_def = self.parse_decl() 
+            if tok is not None and tok.kind != TokenType.VAR:
+                raise SyntaxError("Expected identifier")
+
+            identifier = tok.text
+            self.advance()
+
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.COL:
+                raise SyntaxError("Expected colom token")
+            self.advance()
+
+            tp_var = self.parse_types()
+            
+            tok = self.curr_token()
+            if tok is not None and tok.kind != TokenType.BACKARROW:
+                raise SyntaxError("Expected backarrow")
+            self.advance()
+            
+            exp_def = self.parse_fn_exp()
+
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.IN:
-                sys.exit("Parse error")
+                raise SyntaxError("Expected IN token")
+            self.advance()
 
-            else:
-                self.advance()
-                tok = self.curr_token()
             exp_body = self.parse_fn_exp()
+
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.END:
-                sys.exit("Parse error")
+                raise SyntaxError("Expected END token")
 
-            else:
-                self.advance()
-            return Let(identifier, exp_def, exp_body)
+            self.advance()
+            return Let(identifier, tp_var, exp_def, exp_body)
 
         else:
             return self.parse_val_exp()
@@ -473,40 +498,37 @@ class Parser:
             self.advance()
             return tok.text 
 
-    def parse_decl(self):
-       
-        tok = self.curr_token()
-        if tok is not None and tok.kind == TokenType.VAL:
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.VAR:
-                sys.exit("Expected VAR token")
-            var = str(tok.text)
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.EQL:
-                sys.exit("Expected EQL token")
-            self.advance()
-            value = self.parse_fn_exp()
-            return (var, value)
+    def parse_types(self):
 
-        elif tok is not None and tok.kind == TokenType.FUN:
+        tok = self.curr_token()
+        tp = self.parse_type()
+        if tok is not None and tok.kind == TokenType.TPF:
             self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.VAR:
-                sys.exit("Expected VAR token(name of rec function)")
-            name = str(tok.text)
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.VAR:
-                sys.exit("Expected VAR token(parameter of rec function)")
-            formal = str(tok.text)
-            self.advance()
-            tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.EQL:
-                sys.exit("Expected EQL token in recursive function declaration")
-            self.advance()
-            tok = self.curr_token()
-            body = self.parse_fn_exp()
-            return (name, Fun(name, formal, body))
+            tp = ArrowType(tp, self.parse_types())
+        return tp
+
+
+    def parse_type(self):
+
+        tok = self.curr_token()
+        if tok.kind in (TokenType.INT, TokenType.LGC, TokenType.LPR):
+            
+            if tok is not None and tok.kind == TokenType.INT:
+                self.advance()
+                return type(1) 
+            elif tok is not None and tok.kind == TokenType.LGC:
+                self.advance()
+                return type(True)
+            elif tok is not None and tok.kind == TokenType.LPR:
+                self.advance()
+                node = self.parse_types()
+                tok = self.curr_token()
+                if tok is not None and tok.kind != TokenType.RPR:
+                    raise SyntaxError("Expected right parenthesis")
+                self.advance()
+                return node
+        else:
+            raise SyntaxError("Syntax error during parse type operation")
+
+
 
