@@ -2,28 +2,21 @@ import sys
 from abc import ABC, abstractmethod
 from Expression import *
 
-class ArrowType():
-    def __init__(self, tp_formal, tp_body):
-
-        self.hd = tp_formal
-        self.tl = tp_body
-
-    def __eql__(self, other):
-        if isinstance(other, ArrowType):
-            return self.hd == other.hd and self.tl == other.tl
-        else:
+class ArrowType:
+    """
+    Represents a function type: domain -> codomain
+    """
+    def __init__(self, hd, tl):
+        self.hd = hd  # head/domain type
+        self.tl = tl  # tail/codomain type
+    
+    def __eq__(self, other):
+        if not isinstance(other, ArrowType):
             return False
-
-    def __repr__(self):
-        if isinstance(self.hd, ArrowType):
-            hd_str = f"( {str(self.hd)} )"
-        else:
-            hd_str = str(self.hd)
-        if isinstance(self.tl, ArrowType):
-            tl_str = f"( {str(self.tl)} )"
-        else:
-            tl_str = str(self.tl)
-        return f"{hd_str} -> {tl_str}"
+        return self.hd == other.hd and self.tl == other.tl
+    
+    def __str__(self):
+        return f"{self.hd} -> {self.tl}"
 
 class Function():
     def __init__(self, formal, body, env):
@@ -33,7 +26,7 @@ class Function():
         self.env = env
 
     def __str__(self):
-        return f"Fn({self.formal})"
+        return f"Fn({self.formal.identifier})"
 
 class RecFunction(Function):
 
@@ -109,9 +102,6 @@ class Visitor(ABC):
         pass
     @abstractmethod
     def visit_rec_fun(self, exp, env):
-        pass
-    @abstractmethod
-    def visit_mod(self, exp, env):
         pass
 
 class EvalVisitor(Visitor):
@@ -226,7 +216,7 @@ class EvalVisitor(Visitor):
     def visit_let(self, let, env):
         definition_value = let.exp_def.accept(self, env)
         new_env = env.copy()
-        new_env[let.identifier] = definition_value
+        new_env[let.identifier.identifier] = definition_value
         return let.exp_body.accept(self, new_env) 
     
     def visit_and(self, exp, env):
@@ -280,20 +270,12 @@ class EvalVisitor(Visitor):
         parameter_value = exp.actual.accept(self, env)
 
         new_env = function_value.env.copy()
-        new_env[function_value.formal] = parameter_value 
+        new_env[function_value.formal.identifier] = parameter_value 
 
         if isinstance(function_value, RecFunction):
-            new_env[function_value.name] = function_value
+            new_env[function_value.name.identifier] = function_value
 
         return function_value.body.accept(self, new_env)
-
-    def visit_mod(self, exp, env):
-        left = exp.left.accept(self, env)
-        right = exp.right.accept(self, env)
-        if type(left) == type(1) and type(right == type(1)):
-            return left % right
-        else:
-            sys.exit("Type error")
 
 class UseDefVisitor(Visitor):
     """
@@ -389,9 +371,6 @@ class UseDefVisitor(Visitor):
         pass
 
     def visit_rec_fun(self, exp, env):
-        pass
-
-    def visit_mod(self, exp, env):
         pass
 
 def safe_eval(exp):
@@ -528,7 +507,9 @@ class CtrGenVisitor(Visitor):
 class TypeCheckVisitor(Visitor):
 
     def visit_var(self, var, env):
-        return env[var]
+        if var.identifier not in env:
+            raise TypeError("Def error")
+        return env[var.identifier]
 
     def visit_num(self, num, env):
         return type(1)
@@ -537,43 +518,43 @@ class TypeCheckVisitor(Visitor):
 
         left = sub.left.accept(self, env)
         right = sub.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(1)
         else:
-            raise TypeError("Erro de tipo")
-
+            raise TypeError("Type Error")
+   
     def visit_add(self, add, env):
         left = add.left.accept(self, env)
         right = add.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(1)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
 
     def visit_div(self, div, env):
         left = div.left.accept(self, env)
         right = div.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(1)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
 
     def visit_mul(self, mul, env):
         left = mul.left.accept(self, env)
         right = mul.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(1)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
        
     def visit_let(self, let, env):
 
         typeE0 = let.exp_def.accept(self, env)
         if typeE0 != let.tp_var:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
         new_env = env.copy()
         new_env[let.identifier] = typeE0
         typeE1 = let.exp_body.accept(self, new_env)
@@ -585,89 +566,85 @@ class TypeCheckVisitor(Visitor):
         e0 = exp.e0.accept(self, env)
         e1 = exp.e1.accept(self, env)
 
-        if not isinstance(cond, type(True)):
-            raise TypeError("Erro de tipo")
+        if cond != type(True):
+            raise TypeError("Type Error")
 
         if e0 != e1:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
         return e0
 
     def visit_or(self, exp, env):
         left = exp.left.accept(self, env)
         right = exp.right.accept(self, env)
-        if isinstance(left, type(True)) and isinstance(right, type(True)):
+        if left == type(True) and right == type(True):
             return type(True)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
 
     def visit_bln(self, bln, env):
-        bln = bln.bln
-        if isinstance(bln, type(True)):
-            return type(True)
-        else:
-            raise TypeError("Erro de tipo")
+        return type(True)
 
     def visit_not(self,not_node, env):
         value = not_node.exp.accept(self, env)
-        if isinstance(value, type(True)):
+        if value == type(True):
             return type(True)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
     def visit_neg(self, neg, env):
         value = neg.exp.accept(self, env)
-        if isinstance(value, type(1)):
+        if value == type(1):
             return type(1)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
     def visit_and(self, exp, env):
         left = exp.left.accept(self, env)
         right = exp.right.accept(self, env)
-        if isinstance(left, type(True)) and isinstance(right, type(True)):
+        if left == type(True) and right == type(True):
             return type(True)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
     def visit_leq(self, leq, env):
         left = leq.left.accept(self, env)
         right = leq.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(True)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
 
     def visit_lth(self, lth, env):
         left = lth.left.accept(self, env)
         right = lth.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(True)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
 
     def visit_eql(self, eql, env):
         left = eql.left.accept(self, env)
         right = eql.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == right:
             return type(True)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
 
     def visit_app(self, exp, env):
 
         function_type = exp.function.accept(self, env)
-        actual_type = exp.function.accept(self, env)
+        actual_type = exp.actual.accept(self, env)
         
         if not isinstance(function_type, ArrowType):
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
 
-        if not isinstance(actual_type, function_type.hd):
-            raise TypeError("Erro de tipo")
+        if actual_type != function_type.hd:
+            raise TypeError("Type Error")
             
         return function_type.tl
 
@@ -682,12 +659,14 @@ class TypeCheckVisitor(Visitor):
 
     def visit_rec_fun(self, exp, env):
         #NAO IMPLEMENTAR
+        pass
 
     def visit_mod(self, exp, env):
         left = exp.left.accept(self, env)
         right = exp.right.accept(self, env)
-        if isinstance(left, type(1)) and isinstance(right, type(1)):
+        if left == type(1) and right == type(1):
             return type(1)
         else:
-            raise TypeError("Erro de tipo")
+            raise TypeError("Type Error")
+
 

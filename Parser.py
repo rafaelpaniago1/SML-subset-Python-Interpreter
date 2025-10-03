@@ -247,13 +247,12 @@ class Parser:
            self.advance()
            tok = self.curr_token()
 
-           if tok is not None and tok.kind != TokenType.COL:
-              raise SyntaxError("Expected colom token") 
-            
-           self.advance()
-           tp_var = self.parse_types()
+           tp_var = None
+           if tok is not None and tok.kind == TokenType.COL:
+               self.advance()
+               tp_var = self.parse_types()
+               tok = self.curr_token()
 
-           tok = self.curr_token()
            if tok is not None and tok.kind != TokenType.ARW:
               raise SyntaxError("Expected ARW token")
 
@@ -435,13 +434,12 @@ class Parser:
             self.advance()
 
             tok = self.curr_token()
-            if tok is not None and tok.kind != TokenType.COL:
-                raise SyntaxError("Expected colom token")
-            self.advance()
-
-            tp_var = self.parse_types()
+            tp_var = None
+            if tok is not None and tok.kind == TokenType.COL:
+                self.advance()
+                tp_var = self.parse_types()
+                tok = self.curr_token()
             
-            tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.BACKARROW:
                 raise SyntaxError("Expected backarrow")
             self.advance()
@@ -496,12 +494,12 @@ class Parser:
             return exp
         elif tok is not None and tok.kind == TokenType.VAR:
             self.advance()
-            return tok.text 
+            return Var(tok.text) 
 
     def parse_types(self):
 
-        tok = self.curr_token()
         tp = self.parse_type()
+        tok = self.curr_token()
         if tok is not None and tok.kind == TokenType.TPF:
             self.advance()
             tp = ArrowType(tp, self.parse_types())

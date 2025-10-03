@@ -122,6 +122,9 @@ class Lexer:
         if self.currChar == "*":
             self.nextChar()
             return Token("*", TokenType.MUL)
+        if self.currChar == "/":
+            self.nextChar()
+            return Token("/", TokenType.DIV)
         if self.source.startswith("div", self.sourcePointer):
             self.sourcePointer += 3
             self.currChar = self.source[self.sourcePointer] if self.sourcePointer < len(self.source) else None
