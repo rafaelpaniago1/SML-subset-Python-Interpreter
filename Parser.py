@@ -241,7 +241,7 @@ class Parser:
 
            if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token")
-           arg = Var(str(tok.text))
+           arg = str(tok.text)
 
            self.advance()
            tok = self.curr_token()
@@ -481,7 +481,7 @@ class Parser:
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token")
-            var = Var(str(tok.text))
+            var = str(tok.text)
             self.advance()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.EQL:
@@ -495,12 +495,12 @@ class Parser:
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token(name of rec function)")
-            name = Var(str(tok.text))
+            name = str(tok.text)
             self.advance()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.VAR:
                 sys.exit("Expected VAR token(parameter of rec function)")
-            formal = Var(str(tok.text))
+            formal = str(tok.text)
             self.advance()
             tok = self.curr_token()
             if tok is not None and tok.kind != TokenType.EQL:
