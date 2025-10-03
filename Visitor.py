@@ -2,6 +2,29 @@ import sys
 from abc import ABC, abstractmethod
 from Expression import *
 
+class ArrowType():
+    def __init__(self, tp_formal, tp_body):
+
+        self.hd = tp_formal
+        self.tl = tp_body
+
+    def __eql__(self, other):
+        if isinstance(other, ArrowType):
+            return self.hd == other.hd and self.tl == other.tl
+        else:
+            return False
+
+    def __repr__(self):
+        if isinstance(self.hd, ArrowType):
+            hd_str = f"( {str(self.hd)} )"
+        else:
+            hd_str = str(self.hd)
+        if isinstance(self.tl, ArrowType):
+            tl_str = f"( {str(self.tl)} )"
+        else:
+            tl_str = str(self.tl)
+        return f"{hd_str} -> {tl_str}"
+
 class Function():
     def __init__(self, formal, body, env):
 
