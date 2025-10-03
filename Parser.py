@@ -471,7 +471,7 @@ class Parser:
             return exp
         elif tok is not None and tok.kind == TokenType.VAR:
             self.advance()
-            return Var(tok.text) 
+            return tok.text 
 
     def parse_decl(self):
        
